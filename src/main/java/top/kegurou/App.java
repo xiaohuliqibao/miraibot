@@ -28,11 +28,9 @@ import net.mamoe.mirai.utils.BotConfiguration;
  */
 public class App {
 
-    private static final Logger log = LoggerFactory.getLogger(App.class);
-
     public static void main(final String[] args) throws InterruptedException {
         // System.out.println( "Hello World!" );
-        final Bot bot = BotFactoryJvm.newBot(221348761L, "Xiaohuli7bao", new BotConfiguration() {
+        final Bot bot = BotFactoryJvm.newBot(123456789L, "QQ密码", new BotConfiguration() {
             {
                 fileBasedDeviceInfo("deviceInfo.json");
             }
@@ -47,26 +45,16 @@ public class App {
         Events.registerEvents(bot, new SimpleListenerHost() {
             @EventHandler
             public ListeningStatus onFriendMessage(FriendMessageEvent event) {
-                log.info("收到好友信息，开始监听");
                 String friendMsg = event.getMessage().contentToString();
-                log.info("消息属性获取");
-                log.info("发送者的昵称：" + event.getSender().getNick());
-                log.info("发送者的名称：" + event.getSenderName());
-                log.info("发送者的QQ：" + event.getSender().getId());
-                log.info("发送的消息内容" + friendMsg);
-                // System.out.println(event.getSenderName());
-                // System.out.println(event.getMessage().contentToString());
+                System.out.println(event.getSenderName());
+                System.out.println(event.getMessage().contentToString());
                 return ListeningStatus.LISTENING;
             }
 
             @EventHandler
-            public ListeningStatus onGroupMessage(GroupMessageEvent event) {
-                log.info("收到群信息，开始监听");
+            public ListeningStatus onGroupMessage(GroupMessageEvent event) { 
                 String groupMsg = event.getMessage().contentToString();
-                // System.out.println(groupMsg);
-                log.info("显示消息的群名称" + event.getGroup().getName());
-                log.info("显示消息的发送人" + event.getSender().getNick());
-                log.info("显示收到的群消息内容" + groupMsg);
+                System.out.println(groupMsg);
                 if (groupMsg.contains("喷一下")) {
                     event.getGroup().sendMessage("喷不动了。");
                 }
