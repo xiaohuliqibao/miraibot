@@ -1,5 +1,7 @@
 package top.kegurou;
 
+import java.net.URL;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -19,8 +21,14 @@ import net.mamoe.mirai.event.SimpleListenerHost;
 import net.mamoe.mirai.event.events.FriendEvent;
 import net.mamoe.mirai.message.FriendMessageEvent;
 import net.mamoe.mirai.message.GroupMessageEvent;
+import net.mamoe.mirai.message.data.At;
+import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
+import net.mamoe.mirai.message.data.MessageSource;
+import net.mamoe.mirai.message.data.MessageUtils;
 import net.mamoe.mirai.utils.BotConfiguration;
+import top.kegurou.features.Menu;
+import top.kegurou.features.Shadiao;
 
 /**
  * Hello world!
@@ -30,7 +38,7 @@ public class App {
 
     public static void main(final String[] args) throws InterruptedException {
         // System.out.println( "Hello World!" );
-        final Bot bot = BotFactoryJvm.newBot(123456789L, "QQ密码", new BotConfiguration() {
+        final Bot bot = BotFactoryJvm.newBot(0L, "", new BotConfiguration() {
             {
                 fileBasedDeviceInfo("deviceInfo.json");
             }
@@ -46,17 +54,35 @@ public class App {
             @EventHandler
             public ListeningStatus onFriendMessage(FriendMessageEvent event) {
                 String friendMsg = event.getMessage().contentToString();
-                System.out.println(event.getSenderName());
-                System.out.println(event.getMessage().contentToString());
                 return ListeningStatus.LISTENING;
             }
 
             @EventHandler
-            public ListeningStatus onGroupMessage(GroupMessageEvent event) { 
+            public ListeningStatus onGroupMessage(GroupMessageEvent event) {
                 String groupMsg = event.getMessage().contentToString();
+
                 System.out.println(groupMsg);
-                if (groupMsg.contains("喷一下")) {
-                    event.getGroup().sendMessage("喷不动了。");
+                if (groupMsg.contains("-功能")) {
+                    String sendMsg = Menu.getMenu();
+                    event.getGroup().sendMessage(sendMsg);
+                } else if (groupMsg.equals("骂我")) {
+                    String sendMsg = Shadiao.getNMSL();
+                    event.getGroup().sendMessage(MessageUtils.newChain(sendMsg).plus(new At(event.getSender())));
+                } else if (groupMsg.equals("夸我")) {
+                    String sendMsg = Shadiao.getCHP();
+                    event.getGroup().sendMessage(MessageUtils.newChain(sendMsg).plus(new At(event.getSender())));
+                } else if (groupMsg.equals("骂菜多")) {
+                    String sendMsg = Shadiao.getNMSL();
+                    event.getGroup().sendMessage(
+                            MessageUtils.newChain(sendMsg).plus(new At(event.getGroup().getOrNull(987654311L))));
+                } else if (groupMsg.equals("来张图片")) {
+                    try {
+                        final Image image = event.getGroup().uploadImage(new URL("http://xxx.com/download.jpg"));
+                        final String imageId = image.getImageId();
+                        event.getGroup().sendMessage(MessageUtils.newImage(imageId));
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                    }
                 }
                 return ListeningStatus.LISTENING;
             }

@@ -1,5 +1,5 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic",
-    "java.dependency.packagePresentation": "flat",
-    "maven.view": "hierarchical"
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.dependency.packagePresentation": "flat",
+  "maven.view": "hierarchical"
 }

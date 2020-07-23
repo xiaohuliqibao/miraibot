@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import top.kegurou.features.Menu;
+
 /**
  * Unit test for simple App.
  */
@@ -22,9 +24,11 @@ public class AppTest {
 
     @Test
     public void testslf4j() {
-        log.debug("debug");
-        log.warn("warm");
-        log.error("error");
         System.out.println("nmd");
+    }
+
+    @Test
+    public void testMune() {
+        System.out.print(Menu.getMenu());
     }
 }
