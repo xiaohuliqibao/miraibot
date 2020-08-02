@@ -1,6 +1,6 @@
 package top.kegurou;
 
-import java.net.URL;
+import java.io.File;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import kotlin.coroutines.CoroutineContext;
 import net.dreamlu.mica.core.validation.GetGroup;
+import net.dreamlu.mica.http.HttpRequest;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactoryJvm;
 import net.mamoe.mirai.contact.Friend;
@@ -27,7 +28,9 @@ import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.MessageSource;
 import net.mamoe.mirai.message.data.MessageUtils;
 import net.mamoe.mirai.utils.BotConfiguration;
+import top.kegurou.bean.LoliconImageBean;
 import top.kegurou.features.Menu;
+import top.kegurou.features.Setu;
 import top.kegurou.features.Shadiao;
 
 /**
@@ -38,7 +41,7 @@ public class App {
 
     public static void main(final String[] args) throws InterruptedException {
         // System.out.println( "Hello World!" );
-        final Bot bot = BotFactoryJvm.newBot(0L, "", new BotConfiguration() {
+        final Bot bot = BotFactoryJvm.newBot(114L, "****", new BotConfiguration() {
             {
                 fileBasedDeviceInfo("deviceInfo.json");
             }
@@ -71,18 +74,28 @@ public class App {
                 } else if (groupMsg.equals("夸我")) {
                     String sendMsg = Shadiao.getCHP();
                     event.getGroup().sendMessage(MessageUtils.newChain(sendMsg).plus(new At(event.getSender())));
-                } else if (groupMsg.equals("骂菜多")) {
-                    String sendMsg = Shadiao.getNMSL();
-                    event.getGroup().sendMessage(
-                            MessageUtils.newChain(sendMsg).plus(new At(event.getGroup().getOrNull(987654311L))));
-                } else if (groupMsg.equals("来张图片")) {
-                    try {
-                        final Image image = event.getGroup().uploadImage(new URL("http://xxx.com/download.jpg"));
-                        final String imageId = image.getImageId();
-                        event.getGroup().sendMessage(MessageUtils.newImage(imageId));
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                    }
+                } else if (groupMsg.equals("来张涩图")) {
+                    String r18 = "0";
+                    String path = "/home/qibao/file/images/";
+                    String format = ".jpg";
+
+                    // 获取imageBean的基本信息
+                    LoliconImageBean imageBean = Setu.getLoliconImage(r18);
+
+                    String imageTitle = imageBean.getTitle();
+                    String imageUrl = imageBean.getUrl();
+                    String sendMsg = "神秘链接：" + imageUrl + "\n";
+
+                    File imageFile = new File(path + imageTitle + format);
+                    HttpRequest.get(imageUrl).execute().toFile(imageFile);
+
+                    // 响应时间有点长，写一个文本消息来缓冲一下使用时的体验，如果处理时间不长可以不用。
+                    System.out.println(imageUrl);
+                    event.getGroup().sendMessage(MessageUtils.newChain(sendMsg).plus(new At(event.getSender())));
+                    final Image image = event.getGroup().uploadImage(imageFile);
+                    final String imageId = image.getImageId();
+                    // System.out.println(imageId);
+                    event.getGroup().sendMessage(MessageUtils.newImage(imageId));
                 }
                 return ListeningStatus.LISTENING;
             }
