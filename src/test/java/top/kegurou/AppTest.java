@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -23,6 +24,7 @@ import net.dreamlu.mica.http.LogLevel;
 import top.kegurou.bean.LoliconImageBean;
 import top.kegurou.features.Menu;
 import top.kegurou.features.Setu;
+import top.kegurou.features.Wangyiyun;
 import top.kegurou.util.HttpUtil;
 
 /**
@@ -39,7 +41,10 @@ public class AppTest {
 
     @Test
     public void testslf4j() {
-        System.out.println("nmd");
+        String msg = "点歌牵丝戏";
+        String name = msg.substring(2, msg.length());
+        System.out.println(name);
+        System.out.println(msg.substring(0, 2).equals("点歌"));
     }
 
     @Test
@@ -127,7 +132,7 @@ public class AppTest {
     @Test
     public void testMicoHttp() {
         String LOLICONAPIURL = "https://api.lolicon.app/setu/";
-        String LOLICONAPIKEY = "********";
+        String LOLICONAPIKEY = "";
         String r18 = "1";
         String s = null;
         s = HttpRequest.get(LOLICONAPIURL).query("apikey", LOLICONAPIKEY).query("r18", r18).execute().asString();
@@ -141,4 +146,38 @@ public class AppTest {
             System.out.println(lBean.getTags().get(j));
         }
     }
+
+    @Test
+    public void testNeMusicComment() {
+        String CLOUDMUSICAPI = "http://music.163.com/api/search/pc";
+        String JUMPURL = "http://music.163.com/song/";
+        String MUSICURL = "http://music.163.com/song/media/outer/url?id=";
+        String JSONCONTENT = "{\"app\": \"com.tencent.structmsg\", 	\"desc\": \"音乐\", 	\"meta\": { 		\"music\": { 			\"app_type\": 1, 			\"desc\": \"\", 			\"jumpUrl\": \"\", 			\"musicUrl\": \"\", 			\"preview\": \"\", 			\"sourceMsgId\": \"0\", 			\"tag\": \"网易云音乐\", 			\"title\": \"\" 		} 	}, 	\"prompt\": \"\", 	\"ver\": \"0.0.0.1\", 	\"view\": \"music\" }";
+        String songName = "牵丝戏";
+        String result = HttpRequest.get(CLOUDMUSICAPI).query("s", songName).query("type", 1).execute().asString();
+        JSONArray songsJsonArray = JSON.parseObject(result).getJSONObject("result").getJSONArray("songs");
+        JSONObject songJsonObject = songsJsonArray.getJSONObject(0);
+        JSONObject artisJsonObject = songJsonObject.getJSONArray("artists").getJSONObject(0);
+        JSONObject albumJsonObject = songJsonObject.getJSONObject("album");
+
+        String name = songJsonObject.getString("name");
+        String id = songJsonObject.getLong("id").toString();
+        String artisName = artisJsonObject.getString("name");
+        String albumPicUrl = albumJsonObject.getString("picUrl");
+        String prompt = "[分享]:" + name;
+        System.out.println("测试！！！");
+        System.out.println("歌曲名：" + name + "\n歌曲ID:" + id + "\n歌手:" + artisName + "\n封面链接:" + albumPicUrl);
+
+        JSONObject jsonContent = JSON.parseObject(JSONCONTENT);
+        JSONObject musicJsonObject = jsonContent.getJSONObject("meta").getJSONObject("music");
+        musicJsonObject.put("desc", artisName);
+        musicJsonObject.put("jumpUrl", JUMPURL + id);
+        musicJsonObject.put("musicUrl", MUSICURL + id);
+        musicJsonObject.put("preview", albumPicUrl);
+        musicJsonObject.put("title", name);
+        jsonContent.put("prompt", prompt);
+        System.out.println("---测试---");
+        System.out.println(jsonContent.toString());
+    }
+
 }

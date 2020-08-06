@@ -24,6 +24,7 @@ import net.mamoe.mirai.message.FriendMessageEvent;
 import net.mamoe.mirai.message.GroupMessageEvent;
 import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.Image;
+import net.mamoe.mirai.message.data.LightApp;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.MessageSource;
 import net.mamoe.mirai.message.data.MessageUtils;
@@ -32,6 +33,7 @@ import top.kegurou.bean.LoliconImageBean;
 import top.kegurou.features.Menu;
 import top.kegurou.features.Setu;
 import top.kegurou.features.Shadiao;
+import top.kegurou.features.Wangyiyun;
 
 /**
  * Hello world!
@@ -68,6 +70,9 @@ public class App {
                 if (groupMsg.contains("-功能")) {
                     String sendMsg = Menu.getMenu();
                     event.getGroup().sendMessage(sendMsg);
+                } else if (groupMsg.contains("-Mirai功能")) {
+                    String sendMsg = Menu.getFeature();
+                    event.getGroup().sendMessage(sendMsg);
                 } else if (groupMsg.equals("骂我")) {
                     String sendMsg = Shadiao.getNMSL();
                     event.getGroup().sendMessage(MessageUtils.newChain(sendMsg).plus(new At(event.getSender())));
@@ -76,9 +81,6 @@ public class App {
                     event.getGroup().sendMessage(MessageUtils.newChain(sendMsg).plus(new At(event.getSender())));
                 } else if (groupMsg.equals("来张涩图")) {
                     String r18 = "0";
-                    String path = "/home/qibao/file/images/";
-                    String format = ".jpg";
-
                     // 获取imageBean的基本信息
                     LoliconImageBean imageBean = Setu.getLoliconImage(r18);
 
@@ -86,16 +88,23 @@ public class App {
                     String imageUrl = imageBean.getUrl();
                     String sendMsg = "神秘链接：" + imageUrl + "\n";
 
-                    File imageFile = new File(path + imageTitle + format);
-                    HttpRequest.get(imageUrl).execute().toFile(imageFile);
-
+                    File imageFile = Setu.saveImageFile(imageUrl, imageTitle);
                     // 响应时间有点长，写一个文本消息来缓冲一下使用时的体验，如果处理时间不长可以不用。
-                    System.out.println(imageUrl);
-                    event.getGroup().sendMessage(MessageUtils.newChain(sendMsg).plus(new At(event.getSender())));
+                    // event.getGroup().sendMessage(MessageUtils.newChain(sendMsg).plus(new
+                    // At(event.getSender())));
                     final Image image = event.getGroup().uploadImage(imageFile);
                     final String imageId = image.getImageId();
-                    // System.out.println(imageId);
                     event.getGroup().sendMessage(MessageUtils.newImage(imageId));
+                } else if (groupMsg.equals("网抑云")) {
+                    String sendMsg = Wangyiyun.getWangyiyunComment();
+                    event.getGroup().sendMessage(sendMsg);
+                } else if (groupMsg.contains("点歌")) {
+                    if (groupMsg.substring(0, 2).equals("点歌")) {
+                        String songName = groupMsg.substring(2, groupMsg.length());
+                        MessageChain ms = MessageUtils
+                                .newChain(new LightApp(Wangyiyun.getCloudMusicJsonContent(songName)));
+                        event.getGroup().sendMessage(ms);
+                    }
                 }
                 return ListeningStatus.LISTENING;
             }
